@@ -5,7 +5,7 @@ let isLoading = false;
 let planningMode = false;
 let pendingPlan = null; // Track the last plan waiting for approval
 
-console.log('🎯 Requiem UI Script Loaded - Version 15.28.0 - Railway Backend Integration');
+console.log('🎯 Requiem UI Script Loaded - Version 15.29.0 - Railway Backend Integration');
 console.log('🔗 Environment Variable VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
 console.log('🔗 All Environment Variables:', import.meta.env);
 
