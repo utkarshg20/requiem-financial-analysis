@@ -1,4 +1,4 @@
-# Minimal requirements for Railway deployment
+# Railway deployment requirements
 fastapi==0.119.0
 uvicorn==0.37.0
 python-dotenv==1.0.0
@@ -9,6 +9,19 @@ python-multipart==0.0.6
 pydantic==2.5.0
 python-dateutil==2.8.2
 
-# Add heavy dependencies one by one to test
+# Data processing
 pandas==2.2.3
 numpy==2.2.5
+
+# Technical analysis (fallback implementations)
+# talib==0.4.28  # Commented out for Railway compatibility
+
+# Vector database
+chromadb==0.4.24
+
+# PDF processing
+PyPDF2==3.0.1
+pdfplumber==0.10.3
+
+# Additional utilities
+aiofiles==23.2.1
