@@ -4,25 +4,22 @@ Converts user queries into optimized search terms for Perplexity API
 """
 
 import re
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, List
 from datetime import datetime
+from .yfinance_resolver import YFinanceCompanyResolver
 
 class EarningsQueryNormalizer:
     """Normalizes earnings queries for better source discovery"""
     
     def __init__(self):
-        # Company name mappings for better search
-        self.company_mappings = {
-            'AAPL': ['Apple', 'Apple Inc'],
-            'MSFT': ['Microsoft', 'Microsoft Corporation'],
-            'NVDA': ['NVIDIA', 'NVIDIA Corporation'],
-            'GOOGL': ['Google', 'Alphabet', 'Alphabet Inc'],
-            'AMZN': ['Amazon', 'Amazon.com Inc'],
-            'META': ['Meta', 'Facebook', 'Meta Platforms'],
-            'TSLA': ['Tesla', 'Tesla Inc'],
-            'NFLX': ['Netflix', 'Netflix Inc'],
-            'AMD': ['AMD', 'Advanced Micro Devices'],
-            'INTC': ['Intel', 'Intel Corporation']
+        # Initialize dynamic company resolver
+        self.company_resolver = YFinanceCompanyResolver()
+        
+        # Keep some common mappings for fallback (ETFs, etc.)
+        self.fallback_mappings = {
+            'SPY': ['SPDR S&P 500 ETF Trust'],
+            'QQQ': ['Invesco QQQ Trust'],
+            'DIA': ['SPDR Dow Jones Industrial Average ETF Trust']
         }
         
         # Quarter mappings
@@ -48,8 +45,11 @@ class EarningsQueryNormalizer:
         # Extract quarter and year
         quarter, year = self._extract_quarter_year(query_lower)
         
-        # Get company name variations
-        company_names = self.company_mappings.get(ticker, [ticker])
+        # Get company name variations dynamically
+        if ticker in self.fallback_mappings:
+            company_names = self.fallback_mappings[ticker]
+        else:
+            company_names = self.company_resolver.get_company_variations(ticker)
         
         # Build optimized search queries
         search_queries = self._build_search_queries(ticker, quarter, year, company_names)
@@ -78,8 +78,8 @@ class EarningsQueryNormalizer:
             if matches:
                 return matches[0]
         
-        # Try company name to ticker mapping
-        for ticker, names in self.company_mappings.items():
+        # Try fallback mappings first (for ETFs, etc.)
+        for ticker, names in self.fallback_mappings.items():
             for name in names:
                 if name.lower() in query_lower:
                     return ticker
