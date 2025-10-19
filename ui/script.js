@@ -5,7 +5,7 @@ let isLoading = false;
 let planningMode = false;
 let pendingPlan = null; // Track the last plan waiting for approval
 
-console.log('🎯 Requiem UI Script Loaded - Version 15.26.0 - Railway Backend Integration');
+console.log('🎯 Requiem UI Script Loaded - Version 15.27.0 - Railway Backend Integration');
 
 // Test Chart.js availability
 if (typeof Chart !== 'undefined') {
@@ -1233,6 +1233,8 @@ async function callRequiemAPI(prompt) {
         
         // Use the appropriate endpoint
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        console.log('🔗 API Base URL:', apiBaseUrl);
+        console.log('🔗 Full URL:', `${apiBaseUrl}${endpoint}`);
         const queryResponse = await fetch(`${apiBaseUrl}${endpoint}`, {
             method: 'POST',
             headers: {
