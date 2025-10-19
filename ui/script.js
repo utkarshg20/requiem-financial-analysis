@@ -5,9 +5,11 @@ let isLoading = false;
 let planningMode = false;
 let pendingPlan = null; // Track the last plan waiting for approval
 
-console.log('🎯 Requiem UI Script Loaded - Version 15.30.0 - Railway Backend Integration');
-console.log('🔗 Environment Variable VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
-console.log('🔗 All Environment Variables:', import.meta.env);
+console.log('🎯 Requiem UI Script Loaded - Version 15.31.0 - Fixed Module Import Error');
+
+// Get API base URL from environment or use default
+const apiBaseUrl = window.VITE_API_BASE_URL || 'http://localhost:8000';
+console.log('🔗 API Base URL:', apiBaseUrl);
 
 // Test Chart.js availability
 if (typeof Chart !== 'undefined') {
@@ -1234,7 +1236,7 @@ async function callRequiemAPI(prompt) {
         }
         
         // Use the appropriate endpoint
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        // Use the global apiBaseUrl variable
         console.log('🔗 API Base URL:', apiBaseUrl);
         console.log('🔗 Full URL:', `${apiBaseUrl}${endpoint}`);
         const queryResponse = await fetch(`${apiBaseUrl}${endpoint}`, {
@@ -1524,7 +1526,7 @@ async function showTickerSuggestions(tickerQuery, inputElement) {
     showTickerLoading(inputElement);
     
     // Get API base URL
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    // Use the global apiBaseUrl variable
     
     // Fetch suggestions from API
     try {
@@ -1701,7 +1703,7 @@ function closeToolsOverlay() {
 
 async function loadToolsFromAPI() {
     // Get API base URL
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    // Use the global apiBaseUrl variable
     
     try {
         const response = await fetch(`${apiBaseUrl}/tools`);
@@ -1881,7 +1883,7 @@ async function handleFileUpload(event) {
         formData.append('file', file);
         
         // Get API base URL
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        // Use the global apiBaseUrl variable
         
         // Upload to API
         const response = await fetch(`${apiBaseUrl}/tools/upload`, {
