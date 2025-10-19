@@ -130,7 +130,7 @@ class EarningsQueryNormalizer:
         return quarter, year
     
     def _build_search_queries(self, ticker: str, quarter: str, year: str, company_names: list) -> list:
-        """Build multiple optimized search queries for Perplexity"""
+        """Build multiple optimized search queries for Perplexity - Press Release Focused"""
         queries = []
         
         if not ticker or not quarter:
@@ -139,24 +139,24 @@ class EarningsQueryNormalizer:
         # Primary company name
         primary_company = company_names[0] if company_names else ticker
         
-        # Query 1: Direct PDF search
-        queries.append(f"{primary_company} {year} {quarter} earnings call transcript PDF investor relations")
-        
-        # Query 2: Earnings report search
+        # Query 1: Earnings report PDF transcript (BEST FORMAT - proven to work)
         queries.append(f"{primary_company} {year} {quarter} earnings report PDF transcript")
         
+        # Query 2: Press release search
+        queries.append(f"{primary_company} {year} {quarter} earnings press release investor relations")
+        
         # Query 3: Specific quarter format
-        queries.append(f"{primary_company} Q{quarter[1]} {year} earnings call transcript PDF")
+        queries.append(f"{primary_company} Q{quarter[1]} {year} earnings report PDF")
         
         # Query 4: Alternative company names
         if len(company_names) > 1:
-            queries.append(f"{company_names[1]} {year} {quarter} earnings call transcript PDF")
+            queries.append(f"{company_names[1]} {year} {quarter} earnings report PDF transcript")
         
-        # Query 5: SEC filing search
-        queries.append(f"{primary_company} {year} {quarter} 10-Q 8-K earnings call transcript")
+        # Query 5: Conference call + press release
+        queries.append(f"{primary_company} {year} {quarter} conference call press release earnings")
         
-        # Query 6: Conference call search
-        queries.append(f"{primary_company} {year} {quarter} conference call transcript earnings")
+        # Query 6: Financial results search
+        queries.append(f"{primary_company} {year} {quarter} financial results press release")
         
         return queries
 

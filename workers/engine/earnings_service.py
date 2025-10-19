@@ -118,7 +118,7 @@ class PerplexityAPI:
                     "messages": [
                         {
                             "role": "user",
-                            "content": f"Find the official investor relations page and earnings call transcript PDF for: {search_query}. Return only the direct URLs to the IR page and transcript PDF if available. Format as JSON with keys: ir_page, transcript_pdf, press_release"
+                            "content": f"Find the official investor relations page and earnings press release for: {search_query}. Focus on press releases and earnings announcements. Return only the direct URLs. Format as JSON with keys: ir_page, press_release, earnings_announcement"
                         }
                     ],
                     "max_tokens": 500,
@@ -623,9 +623,41 @@ class EarningsService:
         return None
     
     def _fetch_and_parse_document(self, ticker: str, quarter: str, sources: List[Dict[str, str]]) -> Optional[EarningsDocument]:
-        """Fetch and parse earnings document from sources"""
+        """Fetch and parse earnings document from sources - Press Release Focused"""
         for source in sources:
-            # Try transcript PDF first
+            # Try press release first (BEST SOURCE - proven to work)
+            if 'press_release' in source and source['press_release'] and source['press_release'] != 'null':
+                url = source['press_release']
+                content, page_anchors = self.pdf_parser.parse_html_from_url(url)
+                if content and self._is_valid_earnings_content(content):
+                    doc_id = self._generate_doc_id(ticker, quarter)
+                    return EarningsDocument(
+                        doc_id=doc_id,
+                        ticker=ticker,
+                        quarter=quarter,
+                        artifact="earnings_press_release",
+                        source_url=url,
+                        content=content,
+                        page_anchors=page_anchors
+                    )
+            
+            # Try earnings announcement
+            if 'earnings_announcement' in source and source['earnings_announcement'] and source['earnings_announcement'] != 'null':
+                url = source['earnings_announcement']
+                content, page_anchors = self.pdf_parser.parse_html_from_url(url)
+                if content and self._is_valid_earnings_content(content):
+                    doc_id = self._generate_doc_id(ticker, quarter)
+                    return EarningsDocument(
+                        doc_id=doc_id,
+                        ticker=ticker,
+                        quarter=quarter,
+                        artifact="earnings_announcement",
+                        source_url=url,
+                        content=content,
+                        page_anchors=page_anchors
+                    )
+            
+            # Try transcript PDF as fallback
             if 'transcript_pdf' in source and source['transcript_pdf'] and source['transcript_pdf'] != 'null':
                 url = source['transcript_pdf']
                 content, page_anchors = self.pdf_parser.parse_pdf_from_url(url)
@@ -657,7 +689,7 @@ class EarningsService:
                         page_anchors=page_anchors
                     )
             
-            # Try IR page as fallback
+            # Try IR page as last resort
             if 'ir_page' in source and source['ir_page'] and source['ir_page'] != 'null':
                 url = source['ir_page']
                 content, page_anchors = self.pdf_parser.parse_html_from_url(url)
@@ -667,7 +699,7 @@ class EarningsService:
                         doc_id=doc_id,
                         ticker=ticker,
                         quarter=quarter,
-                        artifact="earnings_call_transcript",
+                        artifact="ir_page",
                         source_url=url,
                         content=content,
                         page_anchors=page_anchors
