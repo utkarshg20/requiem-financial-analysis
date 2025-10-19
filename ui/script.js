@@ -5,7 +5,7 @@ let isLoading = false;
 let planningMode = false;
 let pendingPlan = null; // Track the last plan waiting for approval
 
-console.log('🎯 Requiem UI Script Loaded - Version 15.25.0 - Earnings Calls Integration');
+console.log('🎯 Requiem UI Script Loaded - Version 15.26.0 - Railway Backend Integration');
 
 // Test Chart.js availability
 if (typeof Chart !== 'undefined') {
@@ -1232,7 +1232,8 @@ async function callRequiemAPI(prompt) {
         }
         
         // Use the appropriate endpoint
-        const queryResponse = await fetch(`http://localhost:8000${endpoint}`, {
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        const queryResponse = await fetch(`${apiBaseUrl}${endpoint}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1259,7 +1260,7 @@ async function callRequiemAPI(prompt) {
             updateLoadingStage('executing', 'Running backtest simulation...');
             
             // Execute the backtest
-            const executeResponse = await fetch('http://localhost:8000/runs/execute', {
+            const executeResponse = await fetch(`${apiBaseUrl}/runs/execute`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1274,7 +1275,7 @@ async function callRequiemAPI(prompt) {
             const executeResult = await executeResponse.json();
             
             // Fetch the tearsheet using the run_id
-            const tearsheetResponse = await fetch(`http://localhost:8000/runs/${executeResult.run_id}/tearsheet`);
+            const tearsheetResponse = await fetch(`${apiBaseUrl}/runs/${executeResult.run_id}/tearsheet`);
             
             if (!tearsheetResponse.ok) {
                 throw new Error(`Failed to fetch tearsheet: ${tearsheetResponse.status}`);
@@ -1361,7 +1362,7 @@ async function callRequiemAPI(prompt) {
             if (selectedTools.length > 0) {
                 updateLoadingStage('executing', 'Executing tool calculations...');
                 
-                const toolResponse = await fetch('http://localhost:8000/tools/execute', {
+                const toolResponse = await fetch(`${apiBaseUrl}/tools/execute`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1408,7 +1409,7 @@ async function callRequiemPlanningAPI(prompt) {
         const selectedTools = getSelectedTools();
         
         // Use the planning endpoint
-        const queryResponse = await fetch('http://localhost:8000/query/plan', {
+        const queryResponse = await fetch(`${apiBaseUrl}/query/plan`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1518,9 +1519,12 @@ async function showTickerSuggestions(tickerQuery, inputElement) {
     // Show loading state
     showTickerLoading(inputElement);
     
+    // Get API base URL
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    
     // Fetch suggestions from API
     try {
-        const response = await fetch(`http://localhost:8000/ticker-suggestions?q=${encodeURIComponent(tickerQuery)}`);
+        const response = await fetch(`${apiBaseUrl}/ticker-suggestions?q=${encodeURIComponent(tickerQuery)}`);
         const data = await response.json();
         
         const matches = data.suggestions || [];
@@ -1692,8 +1696,11 @@ function closeToolsOverlay() {
 }
 
 async function loadToolsFromAPI() {
+    // Get API base URL
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    
     try {
-        const response = await fetch('http://localhost:8000/tools');
+        const response = await fetch(`${apiBaseUrl}/tools`);
         if (response.ok) {
             const data = await response.json();
             toolsData.orchid = data.requiem_tools.map(tool => ({
@@ -1869,8 +1876,11 @@ async function handleFileUpload(event) {
         const formData = new FormData();
         formData.append('file', file);
         
+        // Get API base URL
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        
         // Upload to API
-        const response = await fetch('http://localhost:8000/tools/upload', {
+        const response = await fetch(`${apiBaseUrl}/tools/upload`, {
             method: 'POST',
             body: formData
         });
