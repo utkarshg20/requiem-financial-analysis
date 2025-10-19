@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Requiem - Trading Strategy Backtester</title>
+    <link rel="icon" type="image/png" href="requiem_logo.png">
+    <link rel="stylesheet" href="styles.css?v=2.8.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="requiem_logo.png" alt="Requiem Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <i class="fas fa-chart-line" style="display:none; font-size: 24px; color: var(--text-secondary);"></i>
+                <span>REQUIEM</span>
+            </div>
+            <div class="sidebar-controls">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- New Chat Button -->
+        <div class="new-chat-section">
+            <button class="new-chat-btn" id="newChatBtn">
+                <i class="fas fa-plus"></i>
+                New Chat
+            </button>
+        </div>
+
+        <!-- Chat History -->
+        <div class="chat-history" id="chatHistory">
+            <!-- Chat items will be dynamically added here -->
+            <div class="chat-item active">
+                <div class="chat-item-content">
+                    <div class="chat-title">SPY Momentum Strategy</div>
+                    <div class="chat-subtitle">12-month momentum with monthly rebalancing</div>
+                </div>
+                <div class="chat-date">Today</div>
+            </div>
+            
+            <div class="chat-item">
+                <div class="chat-item-content">
+                    <div class="chat-title">QQQ Z-Score Analysis</div>
+                    <div class="chat-subtitle">Mean reversion strategy on QQQ</div>
+                </div>
+                <div class="chat-date">Yesterday</div>
+            </div>
+
+            <div class="chat-item">
+                <div class="chat-item-content">
+                    <div class="chat-title">AAPL Cross-Over Strategy</div>
+                    <div class="chat-subtitle">20/50 day moving average crossover</div>
+                </div>
+                <div class="chat-date">2 days ago</div>
+            </div>
+
+            <div class="chat-item">
+                <div class="chat-item-content">
+                    <div class="chat-title">Portfolio Optimization</div>
+                    <div class="chat-subtitle">Multi-asset portfolio with risk parity</div>
+                </div>
+                <div class="chat-date">1 week ago</div>
+            </div>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <div class="footer-item" onclick="showToolsSection()">
+                <i class="fas fa-tools"></i>
+                <span>Tools</span>
+            </div>
+            <div class="footer-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </div>
+            <div class="footer-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Exit</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Tools Management Overlay -->
+        <div class="tools-overlay" id="toolsOverlay" style="display: none;">
+            <div class="tools-modal">
+                <div class="tools-modal-header">
+                    <h1>Manage Tools</h1>
+                    <button class="tools-close-btn" onclick="closeToolsOverlay()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="tools-modal-content">
+                    <!-- Upload New Tool -->
+                    <div class="upload-section">
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-arrow-up upload-icon"></i>
+                            <span class="upload-text">Upload new tool</span>
+                            <input type="file" id="toolUpload" accept=".zip" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <!-- Tools Grid -->
+                    <div class="tools-grid">
+                        <!-- Requiem Tools (Built-in) -->
+                        <div class="tools-column">
+                            <h2>Requiem Tools</h2>
+                            <div class="tools-divider"></div>
+                            <div class="tools-scroll-container">
+                                <div class="tools-list" id="requiemTools">
+                                    <!-- Built-in tools will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Tools (Uploaded) -->
+                        <div class="tools-column">
+                            <h2>User Tools</h2>
+                            <div class="tools-divider"></div>
+                            <div class="tools-scroll-container">
+                                <div class="tools-list" id="userTools">
+                                    <!-- User-uploaded tools will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <!-- Welcome Message -->
+            <div class="welcome-section">
+                <div class="welcome-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h1>Hi there! How can I help you with your trading strategy?</h1>
+                <p class="welcome-subtitle">Ask me to backtest strategies, analyze performance, or optimize your portfolio.</p>
+                
+                <!-- Quick Action Cards -->
+                <div class="quick-actions">
+                    <div class="action-card" data-prompt="Backtest a 12-month momentum strategy on SPY with monthly rebalancing">
+                        <div class="action-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Quick Backtest</h3>
+                            <p>Test momentum strategies on SPY</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" data-prompt="Analyze QQQ with z-score mean reversion strategy">
+                        <div class="action-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Mean Reversion</h3>
+                            <p>Z-score strategies for QQQ</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" data-prompt="Compare different rebalancing frequencies for AAPL">
+                        <div class="action-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Strategy Compare</h3>
+                            <p>Compare multiple approaches</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" data-prompt="Show me the best performing features for 2023">
+                        <div class="action-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Feature Analysis</h3>
+                            <p>Find top performing features</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages (hidden initially) -->
+            <div class="messages-container" id="messagesContainer" style="display: none;">
+                <!-- Messages will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    id="messageInput" 
+                    class="input-box"
+                    placeholder="Ask Requiem..." 
+                    rows="1"
+                    maxlength="4000"
+                ></textarea>
+                <button id="planningModeBtn" class="planning-toggle" title="Toggle Planning Mode">
+                    📋
+                </button>
+                <button class="send-btn" id="sendBtn" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="input-footer">
+                <span>Tip: Try "Backtest 12-month momentum on SPY since 2023" or "Compare SMA strategies on QQQ"<br>
+                <strong>Ticker Selection:</strong> Type "$" followed by your ticker (e.g., "$NVDA") and use the dropdown to select the exact format</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p id="loadingStatus">Processing...</p>
+            <div class="loading-stages" id="loadingStages">
+                <div class="stage" data-stage="thinking">
+                    <span class="stage-icon">🧠</span>
+                    <span class="stage-text">Understanding query...</span>
+                </div>
+                <div class="stage" data-stage="planning">
+                    <span class="stage-icon">📋</span>
+                    <span class="stage-text">Planning...</span>
+                </div>
+                <div class="stage" data-stage="executing">
+                    <span class="stage-icon">⚡</span>
+                    <span class="stage-text">Executing...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=15.30.0&t=1734567916&r=12368&bust=1734567916"></script>
+</body>
+</html>

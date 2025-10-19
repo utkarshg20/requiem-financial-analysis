@@ -1,0 +1,58 @@
+{
+  "spec": {
+    "domain": "equities_factor",
+    "ticker": "SPY",
+    "start": "2023-01-01",
+    "end": "2023-12-31",
+    "trading_rules": {
+      "rebalance": "monthly",
+      "transaction_costs_bps": 5.0
+    },
+    "custom": {
+      "feature": "momentum_12m_skip_1m",
+      "signal_rule": {
+        "type": "rank_top_frac",
+        "top_frac": 0.2,
+        "lower": null,
+        "upper": null,
+        "fast_ma": 20,
+        "slow_ma": 50
+      }
+    },
+    "underlying": null,
+    "expiry": null,
+    "target_call_delta": 0.16,
+    "target_put_delta": -0.16
+  },
+  "metrics": {
+    "cagr": 0.2236151352755329,
+    "vol_annual": 0.13073957198627353,
+    "sharpe": 1.550204812585182,
+    "sortino": 2.76361368000811,
+    "hit_rate": 0.544,
+    "max_drawdown_pct": -0.10078281633368391,
+    "max_drawdown_date": "2023-10-27",
+    "avg_turnover": 8.096385542168674,
+    "exposure_share": 0.984
+  },
+  "summary": {
+    "title": "Momentum 12M Skip 1M (Monthly Rebal) \u2014 SPY",
+    "period": {
+      "start": "2023-01-01",
+      "end": "2023-12-31"
+    },
+    "config": {
+      "feature": "momentum_12m_skip_1m",
+      "signal_type": "rank_top_frac",
+      "signal_params": {
+        "type": "rank_top_frac",
+        "top_frac": 0.2,
+        "fast_ma": 20,
+        "slow_ma": 50
+      },
+      "rebalance": "monthly",
+      "tc_bps": 5.0
+    }
+  },
+  "data_snapshot_id": "polygon_2023-12-31_650_90a9dffe8f81d959"
+}

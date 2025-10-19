@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Momentum Breakout",
+    "spec": {
+      "spec_id": "momentum_breakout",
+      "domain": "equities_factor",
+      "ticker": "SPY",
+      "start": "2023-01-01",
+      "end": "2023-12-31",
+      "custom": {
+        "feature": "momentum_12m_skip_1m",
+        "signal_rule": {
+          "type": "rank_top_frac",
+          "top_frac": 0.2
+        }
+      }
+    }
+  },
+  {
+    "name": "Z-Score Mean Reversion",
+    "spec": {
+      "spec_id": "zscore_mr",
+      "domain": "equities_factor",
+      "ticker": "SPY",
+      "start": "2023-01-01",
+      "end": "2023-12-31",
+      "custom": {
+        "feature": "zscore_20d",
+        "signal_rule": {
+          "type": "band",
+          "lower": -1.0
+        }
+      }
+    }
+  },
+  {
+    "name": "Golden Cross",
+    "spec": {
+      "spec_id": "golden_cross",
+      "domain": "equities_factor",
+      "ticker": "SPY",
+      "start": "2023-01-01",
+      "end": "2023-12-31",
+      "custom": {
+        "feature": "sma_20",
+        "signal_rule": {
+          "type": "crossover",
+          "fast_ma": 20,
+          "slow_ma": 50
+        }
+      }
+    }
+  }
+]

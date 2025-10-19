@@ -1,0 +1,40 @@
+# Exclude heavy files and folders
+chroma_db/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+
+# Exclude heavy dependencies
+workers/engine/talib_indicators.py
+workers/engine/talib_tool_executor.py
+workers/engine/vercel_talib_wrapper.py
+workers/engine/earnings_service.py
+workers/engine/vercel_earnings_service.py
+workers/engine/vercel_chromadb.py
+workers/engine/metric_extractor.py
+workers/engine/openai_earnings_service.py
+
+# Exclude test files
+tests/
+examples/
+demo_*.py
+test_*.py

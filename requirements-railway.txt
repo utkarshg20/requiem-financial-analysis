@@ -1,0 +1,16 @@
+# Railway deployment requirements
+fastapi==0.119.0
+uvicorn==0.37.0
+python-dotenv==1.0.0
+pandas==2.2.3
+numpy==2.2.5
+requests==2.32.5
+openai==2.3.0
+chromadb==1.2.0
+pdfplumber==0.10.3
+beautifulsoup4==4.12.2
+python-multipart==0.0.6
+pydantic==2.5.0
+python-dateutil==2.8.2
+talib==0.4.28
+pandas-market-calendars==5.1.1

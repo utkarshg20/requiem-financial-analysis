@@ -1,0 +1,47 @@
+[
+  {
+    "feature": "momentum_12m_skip_1m",
+    "signal": "rank_top_frac",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "momentum_12m_skip_1m",
+    "signal": "threshold",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "momentum_12m_skip_1m",
+    "signal": "crossover",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "zscore_20d",
+    "signal": "rank_top_frac",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "zscore_20d",
+    "signal": "threshold",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "zscore_20d",
+    "signal": "crossover",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "rsi_14",
+    "signal": "rank_top_frac",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "rsi_14",
+    "signal": "threshold",
+    "error": "Failed to fetch price data for SPY"
+  },
+  {
+    "feature": "rsi_14",
+    "signal": "crossover",
+    "error": "Failed to fetch price data for SPY"
+  }
+]
