@@ -11,7 +11,7 @@ python-dateutil==2.8.2
 
 # Data processing
 pandas==2.2.3
-numpy==2.2.5
+numpy==1.26.4
 
 # Technical analysis (fallback implementations)
 # talib==0.4.28  # Commented out for Railway compatibility
