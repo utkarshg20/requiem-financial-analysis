@@ -1,4 +1,4 @@
-# Railway-optimized requirements (minimal dependencies)
+# Ultra-lightweight Railway requirements
 fastapi==0.119.0
 uvicorn==0.37.0
 python-dotenv==1.0.0
@@ -9,13 +9,8 @@ python-multipart==0.0.6
 pydantic==2.5.0
 python-dateutil==2.8.2
 
-# Data processing (compatible versions)
-pandas==1.5.3
+# Minimal data processing (no pandas build)
 numpy==1.26.4
-
-# Lightweight alternatives
-# chromadb==0.4.24  # Too heavy for Railway
-# pandas_market_calendars==4.3.3  # Not critical for basic functionality
 
 # PDF processing (lightweight)
 PyPDF2==3.0.1
