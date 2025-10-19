@@ -65,6 +65,8 @@ class EarningsQueryNormalizer:
     
     def _extract_ticker(self, query: str) -> Optional[str]:
         """Extract ticker symbol from query"""
+        query_lower = query.lower()
+        
         # Common ticker patterns
         ticker_patterns = [
             r'\b([A-Z]{2,5})\b',  # 2-5 uppercase letters
@@ -108,6 +110,7 @@ class EarningsQueryNormalizer:
         # Extract quarter
         quarter_patterns = [
             r'\b(q[1-4])\b',  # Q1, Q2, Q3, Q4
+            r'\b([1-4]q)\b',  # 1Q, 2Q, 3Q, 4Q
             r'\b(quarter\s*[1-4])\b',  # quarter 1, quarter 2, etc.
             r'\b(first|second|third|fourth)\s+quarter\b',  # first quarter, etc.
             r'\b(1st|2nd|3rd|4th)\s+quarter\b'  # 1st quarter, etc.
@@ -117,13 +120,13 @@ class EarningsQueryNormalizer:
             matches = re.findall(pattern, query)
             if matches:
                 quarter_text = matches[0].lower()
-                if 'q1' in quarter_text or 'first' in quarter_text or '1st' in quarter_text:
+                if 'q1' in quarter_text or 'first' in quarter_text or '1st' in quarter_text or quarter_text == '1q':
                     quarter = 'Q1'
-                elif 'q2' in quarter_text or 'second' in quarter_text or '2nd' in quarter_text:
+                elif 'q2' in quarter_text or 'second' in quarter_text or '2nd' in quarter_text or quarter_text == '2q':
                     quarter = 'Q2'
-                elif 'q3' in quarter_text or 'third' in quarter_text or '3rd' in quarter_text:
+                elif 'q3' in quarter_text or 'third' in quarter_text or '3rd' in quarter_text or quarter_text == '3q':
                     quarter = 'Q3'
-                elif 'q4' in quarter_text or 'fourth' in quarter_text or '4th' in quarter_text:
+                elif 'q4' in quarter_text or 'fourth' in quarter_text or '4th' in quarter_text or quarter_text == '4q':
                     quarter = 'Q4'
                 break
         
