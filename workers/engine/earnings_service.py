@@ -17,6 +17,7 @@ from io import BytesIO
 import json
 from .openai_earnings_service import OpenAIEarningsService
 from .metric_extractor import FinancialMetricExtractor, MetricExtractionResult
+from .query_normalizer import EarningsQueryNormalizer
 
 logger = logging.getLogger(__name__)
 
@@ -68,8 +69,8 @@ class PerplexityAPI:
         if yahoo_sources:
             sources.extend(yahoo_sources)
         
-        # Method 2: Try Perplexity API for additional sources
-        perplexity_sources = self._get_perplexity_sources(ticker, quarter)
+        # Method 2: Try Perplexity API with smart queries
+        perplexity_sources = self._get_smart_perplexity_sources(ticker, quarter)
         if perplexity_sources:
             sources.extend(perplexity_sources)
         
@@ -99,8 +100,52 @@ class PerplexityAPI:
             logger.error(f"Yahoo Finance error: {e}")
             return []
     
+    def _get_smart_perplexity_sources(self, ticker: str, quarter: str) -> List[Dict[str, str]]:
+        """Get sources using Perplexity API with smart query optimization"""
+        try:
+            # Normalize the query for better search
+            normalized = self.query_normalizer.normalize_earnings_query(f"{ticker} {quarter} earnings")
+            
+            # Try multiple optimized queries
+            all_sources = []
+            search_queries = normalized.get('search_queries', [])
+            
+            for i, search_query in enumerate(search_queries[:3]):  # Try top 3 queries
+                logger.info(f"Trying Perplexity query {i+1}: {search_query}")
+                
+                payload = {
+                    "model": "sonar-pro",
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": f"Find the official investor relations page and earnings call transcript PDF for: {search_query}. Return only the direct URLs to the IR page and transcript PDF if available. Format as JSON with keys: ir_page, transcript_pdf, press_release"
+                        }
+                    ],
+                    "max_tokens": 500,
+                    "temperature": 0.1
+                }
+                
+                response = requests.post(self.base_url, headers=self.headers, json=payload, timeout=30)
+                response.raise_for_status()
+                
+                result = response.json()
+                content = result['choices'][0]['message']['content']
+                
+                # Try to extract URLs from the response
+                urls = self._extract_urls(content)
+                if urls:
+                    all_sources.extend(urls)
+                    logger.info(f"Found {len(urls)} sources from query {i+1}")
+                    break  # Stop after first successful query
+            
+            return all_sources
+            
+        except Exception as e:
+            logger.error(f"Smart Perplexity API error: {e}")
+            return []
+    
     def _get_perplexity_sources(self, ticker: str, quarter: str) -> List[Dict[str, str]]:
-        """Get sources using Perplexity API"""
+        """Get sources using Perplexity API (legacy method)"""
         try:
             query = f"{ticker} {quarter} earnings call transcript PDF investor relations"
             
@@ -418,6 +463,7 @@ class EarningsService:
         self.vector_db = VectorDatabase()
         self.openai_service = OpenAIEarningsService()
         self.metric_extractor = FinancialMetricExtractor()
+        self.query_normalizer = EarningsQueryNormalizer()
     
     def process_earnings_query(self, query: str) -> Dict[str, Any]:
         """Main entry point for processing earnings queries"""
