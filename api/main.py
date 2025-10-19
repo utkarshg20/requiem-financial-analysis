@@ -127,11 +127,15 @@ def _format_earnings_analysis_response(analysis_result: Dict[str, Any]) -> str:
     
     # Handle case where earnings_result might be a string or other type
     if not isinstance(earnings_result, dict):
-        return f"📊 **Earnings Analysis for {ticker}**\n\n❌ **Error:** Invalid earnings result format\n\n*Please try again.*"
+        return f"📊 **Earnings Analysis for {ticker}**\n\n❌ **Error:** Invalid earnings result format\n\n*This earnings data is not accessible by Requiem right now. Please try a different quarter.*"
+    
+    # Handle case where earnings_result is empty or None
+    if not earnings_result:
+        return f"📊 **Earnings Analysis for {ticker}**\n\n❌ **Error:** No earnings data found\n\n*This earnings data is not accessible by Requiem right now. Please try a different quarter or check if the earnings call is available.*"
     
     if not earnings_result.get("success", False):
         error_msg = earnings_result.get("error", "Unknown error")
-        return f"📊 **Earnings Analysis for {ticker}**\n\n❌ **Error:** {error_msg}\n\n*Please try again or check if the earnings call is available.*"
+        return f"📊 **Earnings Analysis for {ticker}**\n\n❌ **Error:** {error_msg}\n\n*This earnings data is not accessible by Requiem right now. Please try a different quarter or check if the earnings call is available.*"
     
     # Format the earnings summary in card format
     message = f"📊 **Earnings Analysis for {ticker}**\n\n"
