@@ -1,4 +1,4 @@
-# Ultra-lightweight Railway requirements
+# Railway requirements with pre-built wheels
 fastapi==0.119.0
 uvicorn==0.37.0
 python-dotenv==1.0.0
@@ -9,10 +9,11 @@ python-multipart==0.0.6
 pydantic==2.5.0
 python-dateutil==2.8.2
 
-# Minimal data processing (no pandas build)
-numpy==1.26.4
+# Data processing (use pre-built wheels)
+pandas==2.0.3
+numpy==1.24.3
 
-# PDF processing (lightweight)
+# PDF processing
 PyPDF2==3.0.1
 
 # Additional utilities
