@@ -1,0 +1,20 @@
+# Cursor Optimization Rules
+
+# Disable unnecessary features for faster performance
+- Don't auto-index large directories
+- Skip analysis of node_modules, .venv, __pycache__
+- Limit file watching to active files only
+- Disable unused language servers
+
+# Python-specific optimizations
+- Only index Python files in active workspace
+- Skip type checking for files not in use
+- Limit Pyright memory usage
+
+# Git optimizations
+- Don't watch .git directory
+- Limit git status checks
+
+# File watching
+- Exclude large directories from file watchers
+- Limit simultaneous file operations
