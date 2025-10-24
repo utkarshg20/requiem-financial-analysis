@@ -5,7 +5,7 @@ let isLoading = false;
 let planningMode = false;
 let pendingPlan = null; // Track the last plan waiting for approval
 
-console.log('🎯 Requiem UI Script Loaded - Version 15.32.0 - Added Streaming Responses');
+console.log('🎯 Requiem UI Script Loaded - Version 15.33.0 - Added Workflow Approval UI');
 
 // Get API base URL from environment or use default
 const apiBaseUrl = window.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -531,6 +531,11 @@ function addPlanDisplay(data, message, originalQuery) {
                     ${formatPlanMarkdown(data.plan_markdown)}
                 </div>
             </div>
+            
+            <div class="plan-actions">
+                <button class="approve-btn" onclick="handleApprovalClick(true)">✅ Approve & Execute</button>
+                <button class="cancel-btn" onclick="handleApprovalClick(false)">❌ Cancel</button>
+            </div>
         </div>
     `;
     
@@ -559,6 +564,14 @@ function formatPlanMarkdown(markdown) {
         .replace(/^   Output: (.*$)/gim, '<div class="plan-output">Output: <code>$1</code></div>')
         .replace(/^   Why: (.*$)/gim, '<div class="plan-reasoning">Why: <em>$1</em></div>')
         .replace(/\n/g, '<br>');
+}
+
+function handleApprovalClick(approved) {
+    if (approved) {
+        handlePlanApproval('approve');
+    } else {
+        handlePlanApproval('cancel');
+    }
 }
 
 function isApprovalResponse(message) {
