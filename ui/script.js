@@ -5,7 +5,7 @@ let isLoading = false;
 let planningMode = false;
 let pendingPlan = null; // Track the last plan waiting for approval
 
-console.log('🎯 Requiem UI Script Loaded - Version 15.31.0 - Fixed Module Import Error');
+console.log('🎯 Requiem UI Script Loaded - Version 15.32.0 - Added Streaming Responses');
 
 // Get API base URL from environment or use default
 const apiBaseUrl = window.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -239,10 +239,13 @@ async function sendMessage() {
         // Stage 1: Understanding query
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        // Call Requiem API
+        // Call Requiem API (use streaming for intelligent queries)
+        const isIntelligentQuery = _isIntelligentQuery(message);
         const response = planningMode 
             ? await callRequiemPlanningAPI(message)
-            : await callRequiemAPI(message);
+            : isIntelligentQuery 
+                ? await callRequiemAPIStream(message)
+                : await callRequiemAPI(message);
         
         console.log('📡 Full API Response:', response);
         
@@ -1203,6 +1206,68 @@ function _isIntelligentQuery(prompt) {
     }
     
     return hasIntelligentKeywords || hasTechnicalIndicators;
+}
+
+// Streaming API integration
+async function callRequiemAPIStream(prompt) {
+    try {
+        const selectedTools = getSelectedTools();
+        const isIntelligentQuery = _isIntelligentQuery(prompt);
+        const endpoint = isIntelligentQuery ? '/query/intelligent/stream' : '/query';
+        
+        const response = await fetch(`${apiBaseUrl}${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                query: prompt,
+                selected_tools: selectedTools
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let result = null;
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+            
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+                        
+                        if (data.type === 'status') {
+                            updateLoadingStage('thinking', data.message);
+                        } else if (data.type === 'result') {
+                            result = data.data;
+                        } else if (data.type === 'error') {
+                            throw new Error(data.message);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing SSE data:', e);
+                    }
+                }
+            }
+        }
+        
+        return result || { success: false, error: 'No result received' };
+        
+    } catch (error) {
+        console.error('Streaming API Error:', error);
+        return { success: false, error: error.message };
+    }
 }
 
 // API integration

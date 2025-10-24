@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from datetime import datetime
 import uuid
 import logging
@@ -7,6 +8,8 @@ import os
 import zipfile
 import tempfile
 import numpy as np
+import json
+import asyncio
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -696,6 +699,63 @@ async def handle_intelligent_query(req: QueryRequest) -> QueryResponse:
             message=f"❌ Sorry, I encountered an error while processing your request: {str(e)}. Please try again.",
             success=False
         )
+
+@app.post("/query/intelligent/stream")
+async def handle_intelligent_query_stream(req: QueryRequest):
+    """Handle intelligent analysis queries with streaming responses"""
+    async def generate():
+        try:
+            logger.info(f"Streaming intelligent query: {req.query}")
+            
+            # Send initial status
+            yield f"data: {json.dumps({'type': 'status', 'message': '🔄 Analyzing your query...'})}\n\n"
+            await asyncio.sleep(0.1)
+            
+            # Check if this is a TA-Lib indicator query
+            if _is_talib_indicator_query(req.query):
+                yield f"data: {json.dumps({'type': 'status', 'message': '🔍 Running technical analysis...'})}\n\n"
+                await asyncio.sleep(0.1)
+                
+                # For TA-Lib queries, run normally but stream the result
+                result = await _handle_talib_comparison_query(req)
+                yield f"data: {json.dumps({'type': 'result', 'data': result.dict()})}\n\n"
+                return
+            
+            # Initialize intelligent analyzer
+            analyzer = IntelligentAnalyzer()
+            
+            # Send intent detection status
+            yield f"data: {json.dumps({'type': 'status', 'message': '🎯 Detecting intent...'})}\n\n"
+            await asyncio.sleep(0.1)
+            
+            # For earnings queries, stream progress
+            query_lower = req.query.lower()
+            if any(keyword in query_lower for keyword in ['earnings', 'quarterly', 'transcript', 'conference call']):
+                yield f"data: {json.dumps({'type': 'status', 'message': '📊 Fetching earnings data...'})}\n\n"
+                await asyncio.sleep(0.1)
+            
+            # Analyze the query intelligently
+            analysis_result = analyzer.analyze_query(req.query, req.selected_tools)
+            
+            if "error" in analysis_result:
+                yield f"data: {json.dumps({'type': 'error', 'message': f'❌ {analysis_result[\"error\"]}'})}\n\n"
+                return
+            
+            # Send progress update
+            yield f"data: {json.dumps({'type': 'status', 'message': '✨ Formatting response...'})}\n\n"
+            await asyncio.sleep(0.1)
+            
+            # Format the intelligent response
+            message = _format_intelligent_response(analysis_result)
+            
+            # Stream the complete response
+            yield f"data: {json.dumps({'type': 'result', 'data': {'intent': 'intelligent_analysis', 'intent_confidence': 0.9, 'message': message, 'data': analysis_result, 'success': True}})}\n\n"
+            
+        except Exception as e:
+            logger.error(f"Error in streaming intelligent query: {str(e)}")
+            yield f"data: {json.dumps({'type': 'error', 'message': f'❌ Sorry, I encountered an error: {str(e)}'})}\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 @app.post("/query", response_model=QueryResponse)
 async def handle_query(req: QueryRequest):
